@@ -1,5 +1,4 @@
 # Ignore everything by default
-*
 
 # Allow only specific file types
 !*.py
@@ -22,4 +21,7 @@
 # remove specific files
 __pycache__/
 __init__.py
+
+*.env
+!.env.example
 

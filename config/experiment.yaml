@@ -1,0 +1,38 @@
+seed: 42
+
+paths:
+  raw_data: report_data/raw
+  processed_data: report_data/processed
+  questions: report_data/evaluation/questions.json
+  results: report_results
+  indexes: report_indexes
+
+llm:
+  base_url: ${LLM_BASE_URL}
+  api_key: ${LLM_API_KEY}
+  model: ${LLM_MODEL}
+  temperature: 0
+  max_tokens: 1024
+
+embedding:
+  base_url: ${EMBEDDING_BASE_URL}
+  api_key: ${EMBEDDING_API_KEY}
+  model: ${EMBEDDING_MODEL}
+
+baseline:
+  chunk_size: 500
+  chunk_overlap: 50
+  chunk_unit: token
+  top_k: 5
+
+retrieval:
+  dense_top_k: 20
+  sparse_top_k: 20
+  candidate_top_k: 30
+  final_top_k: 5
+  rrf_k: 60
+
+runtime:
+  repeat_count: 3
+  save_context: true
+  save_scores: true
