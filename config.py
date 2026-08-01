@@ -8,7 +8,7 @@ Change the config here to apply across the entire project.
 Usage in notebooks:
     import sys
     sys.path.append(str(Path(os.getcwd()).parent))
-    from config import get_llm, get_embeddings, LLM_CONFIG, EMBEDDING_CONFIG
+    from config import get_llm, get_embeddings, LLM_CONFIG, EMBEDDING_CONFIG, check_connections
 """
 
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
@@ -79,3 +79,61 @@ def get_embeddings(**kwargs):
         api_key=config["api_key"],
         model=config["model"],
     )
+
+
+# ============================================================
+# CONNECTION CHECK
+# ============================================================
+
+def check_connections():
+    """
+    Test connectivity to both LLM and Embedding endpoints.
+    Logs config details and verifies each service responds.
+    
+    Returns:
+        dict with 'llm' and 'embedding' status (True/False)
+    """
+    import requests
+
+    print("=" * 60)
+    print("CONFIG CHECK")
+    print("=" * 60)
+    print(f"  LLM base_url : {LLM_CONFIG['base_url']}")
+    print(f"  LLM model    : {LLM_CONFIG['model']}")
+    print(f"  LLM api_key  : {'***' if LLM_CONFIG['api_key'] not in ('not-needed', '') else '(none)'}")
+    print(f"  EMB base_url : {EMBEDDING_CONFIG['base_url']}")
+    print(f"  EMB model    : {EMBEDDING_CONFIG['model']}")
+    print(f"  EMB api_key  : {'***' if EMBEDDING_CONFIG['api_key'] not in ('not-needed', '') else '(none)'}")
+    print("-" * 60)
+
+    results = {"llm": False, "embedding": False}
+
+    # Check LLM
+    print("\n[1/2] Testing LLM connection...")
+    try:
+        llm = get_llm(max_tokens=20)
+        response = llm.invoke("Say 'hello' in one word.")
+        print(f"  ✅ LLM OK — response: {response.content.strip()[:80]}")
+        results["llm"] = True
+    except Exception as e:
+        print(f"  ❌ LLM FAILED — {type(e).__name__}: {e}")
+
+    # Check Embedding
+    print("\n[2/2] Testing Embedding connection...")
+    try:
+        emb = get_embeddings()
+        vector = emb.embed_query("test")
+        print(f"  ✅ Embedding OK — vector dim: {len(vector)}")
+        results["embedding"] = True
+    except Exception as e:
+        print(f"  ❌ Embedding FAILED — {type(e).__name__}: {e}")
+
+    print("\n" + "=" * 60)
+    if results["llm"] and results["embedding"]:
+        print("ALL CONNECTIONS OK ✅")
+    else:
+        failed = [k for k, v in results.items() if not v]
+        print(f"FAILED: {', '.join(failed)} ❌")
+    print("=" * 60)
+
+    return results
