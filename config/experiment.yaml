@@ -22,7 +22,11 @@ embedding:
 baseline:
   chunk_size: 500
   chunk_overlap: 50
-  chunk_unit: token
+  chunk_unit: character
+  top_k: 5
+
+reranker:
+  model_name: cross-encoder/ms-marco-MiniLM-L-6-v2
   top_k: 5
 
 retrieval:
